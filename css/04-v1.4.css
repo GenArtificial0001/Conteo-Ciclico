@@ -1,0 +1,113 @@
+/* v1.4.0 — asignaciones móviles, lector de cámara y recorrido vertical */
+#view-assignments .assignment-layout > .card-app { min-width: 0; }
+#view-assignments .assignment-form-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(130px, .45fr);
+  gap: 10px;
+  margin: 0 0 14px !important;
+}
+#view-assignments .assignment-form-grid > * { width: auto; min-width: 0; padding: 0; }
+#view-assignments .assignment-form-grid #assignBtn { min-height: 42px; }
+#view-assignments .assignment-table-shell { min-width: 0; max-width: 100%; }
+#view-assignments .assignment-toolbar { align-items: center; }
+
+.scan-reader {
+  width: 100%;
+  min-height: 300px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #000;
+}
+.scan-reader > div { border: 0 !important; }
+.scan-reader video,
+.scan-reader canvas {
+  width: 100% !important;
+  max-height: min(58vh, 520px) !important;
+  object-fit: cover !important;
+  border-radius: 11px;
+}
+.scan-reader img { max-width: 84px !important; }
+.scan-reader select,
+.scan-reader button {
+  font-family: "Rajdhani", sans-serif !important;
+  border-radius: 8px !important;
+}
+.scan-video[hidden] { display: none !important; }
+
+@media (max-width: 1150px) {
+  #view-assignments .assignment-layout { grid-template-columns: minmax(0, 1fr); }
+  #view-assignments .user-list { max-height: 300px; }
+}
+
+@media (max-width: 820px) {
+  #view-assignments .card-app { padding: 16px; }
+  #view-assignments .assignment-form-grid { grid-template-columns: minmax(0, 1fr); }
+  #view-assignments .assignment-form-grid #assignBtn { width: 100%; min-height: 46px; }
+  #view-assignments .assignment-toolbar { align-items: stretch; }
+  #view-assignments .assignment-toolbar > * { width: 100%; }
+  #view-assignments .assignment-toolbar .datatable-tools { width: 100%; justify-content: space-between; }
+  #view-assignments .assignment-toolbar .datatable-tools label { flex: 1 1 150px; }
+  #view-assignments .assignment-toolbar .page-size-select { flex: 1; }
+  #view-assignments .column-picker { margin-left: auto; }
+  .scan-dialog { max-height: calc(100dvh - 20px); overflow: auto; padding: 14px; }
+  .scan-reader { min-height: 260px; }
+}
+
+@media (max-width: 720px) {
+  #view-assignments .assignment-table-shell { overflow: visible; border: 0; background: transparent; }
+  #assignmentTable { display: block; width: 100%; min-width: 0 !important; }
+  #assignmentTable thead { display: none; }
+  #assignmentTable tbody { display: grid; gap: 12px; width: 100%; }
+  #assignmentTable tbody tr {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--bg-elevated);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .10);
+  }
+  #assignmentTable tbody td {
+    position: static !important;
+    display: grid;
+    grid-template-columns: minmax(108px, .8fr) minmax(0, 1.2fr);
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px !important;
+    border-bottom: 1px solid var(--border);
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow-wrap: anywhere;
+  }
+  #assignmentTable tbody td:last-child { border-bottom: 0; }
+  #assignmentTable tbody td::before {
+    content: attr(data-label);
+    color: var(--text-muted);
+    font-size: .69rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  #assignmentTable tbody td[data-col-key="actions"] { grid-template-columns: 1fr; }
+  #assignmentTable tbody td[data-col-key="actions"]::before { display: none; }
+  #assignmentTable tbody td[data-col-key="actions"] .btn-app { width: 100%; min-height: 40px; }
+  #assignmentTable .assignment-empty-cell { display: block; padding: 0 !important; }
+  #assignmentTable .assignment-empty-cell::before { display: none; }
+  #view-assignments .pagination-app { flex-direction: column; align-items: stretch; }
+  #view-assignments .pager-controls { width: 100%; }
+  #view-assignments .pager-controls .btn-app { flex: 1; min-height: 42px; }
+}
+
+@media (max-width: 520px) {
+  #view-assignments .d-flex.gap-2.mb-3 { display: grid !important; grid-template-columns: minmax(0, 1fr) 46px; }
+  #view-assignments .user-row { align-items: flex-start; }
+  #view-assignments .user-main { min-width: 0; flex: 1; }
+  #view-assignments .user-main > div:last-child { min-width: 0; }
+  #view-assignments .assignment-toolbar .datatable-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+  .scan-modal { padding: 8px; }
+  .scan-dialog { width: 100%; border-radius: 13px; }
+  .scan-reader { min-height: 230px; }
+}
