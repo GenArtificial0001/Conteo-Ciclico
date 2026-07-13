@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Inventory Integrity Control</title>
+<meta content="Prototipo de control de inventario por pasillos, ubicaciones y puestos fijos." name="description"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&amp;family=Rajdhani:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script onerror="this.onerror=null;this.src='https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js';" src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
+
+<link href="css/01-styles.css" rel="stylesheet"/><link href="css/02-styles.css" rel="stylesheet"/><link href="css/03-styles.css" rel="stylesheet"/></head>
+<body>
+<div id="app" class="theme-dark">
+<aside class="sidebar" id="sidebar">
+<div class="brand">
+<div class="brand-mark"><i data-lucide="warehouse"></i></div>
+<div class="brand-copy">
+<strong>INVENTORY CONTROL</strong>
+<span>WAREHOUSE INTEGRITY</span>
+</div>
+</div>
+<nav class="nav-menu">
+<button class="nav-link-app active" data-view="dashboard"><i data-lucide="layout-dashboard"></i><span class="nav-label">Dashboard</span></button>
+<button class="nav-link-app" data-view="import"><i data-lucide="file-up"></i><span class="nav-label">Importación</span></button>
+<button class="nav-link-app" data-view="master"><i data-lucide="table-properties"></i><span class="nav-label">Maestro de ubicaciones</span></button>
+<button class="nav-link-app" data-view="assignments"><i data-lucide="users-round"></i><span class="nav-label">Asignación de pasillos</span></button>
+<button class="nav-link-app" data-view="route"><i data-lucide="scan-line"></i><span class="nav-label">Recorrida</span></button>
+<button class="nav-link-app" data-view="integrity"><i data-lucide="chart-no-axes-combined"></i><span class="nav-label">Integridad</span></button>
+<button class="nav-link-app" data-view="settings"><i data-lucide="settings"></i><span class="nav-label">Configuración</span></button>
+</nav>
+<div class="sidebar-foot">
+<span class="status-dot"></span>
+<div class="sidebar-foot-copy"><strong>Procesamiento local</strong><span>Los archivos no salen del navegador</span></div>
+</div>
+</aside>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<main class="main-shell">
+<header class="topbar">
+<div class="topbar-left">
+<button aria-label="Abrir menú" class="icon-btn mobile-only" id="mobileMenu"><i data-lucide="menu"></i></button>
+<button aria-label="Contraer menú" class="icon-btn" id="sidebarToggle"><i data-lucide="panel-left-close"></i></button>
+<div class="page-heading">
+<h1 id="pageTitle">Dashboard</h1>
+<p id="pageSubtitle">Estado general del maestro y la auditoría de inventario.</p>
+</div>
+</div>
+<div class="topbar-actions">
+<select aria-label="Tema" class="input-app theme-select" id="themeSelect" style="width:auto;min-width:128px">
+<option value="dark">Oscuro</option>
+<option value="light">Claro</option>
+<option value="iron">Industrial</option>
+</select>
+<button class="icon-btn" id="fullscreenBtn" title="Pantalla completa"><i data-lucide="maximize"></i></button>
+<button class="btn-app btn-primary-app" data-go="import"><i data-lucide="upload"></i><span>Cargar archivos</span></button>
+</div>
+</header>
+<section class="content" id="viewHost"><div class="card-app"><div class="spinner-app"></div><p class="card-subtitle text-center">Cargando aplicación…</p></div></section>
+</main>
+<div aria-hidden="true" class="scan-modal" id="qrModal">
+<div class="scan-dialog">
+<div class="card-head"><div><div class="section-kicker">Escáner</div><h2 class="card-title">Leer código QR / barras</h2><p class="card-subtitle" id="qrHelp">Apunte la cámara al código.</p></div><button class="icon-btn" id="closeQrBtn"><i data-lucide="x"></i></button></div>
+<video class="scan-video" id="qrVideo" muted="" playsinline=""></video>
+<div class="mt-3"><label class="field-label">INGRESO MANUAL / LECTOR USB</label><input class="input-app" id="qrManualValue" placeholder="Escanee o escriba el valor y presione Enter"/></div>
+</div>
+</div>
+<div class="toast-stack" id="toastStack"></div>
+<div class="loading-layer" id="loadingLayer"><div class="loading-box"><div class="spinner-app"></div><h3 class="card-title" id="loadingTitle">Procesando</h3><p class="card-subtitle" id="loadingText">Leyendo los archivos...</p></div></div>
+</div>
+<script src="js/00-loader.js"></script>
+</body>
+</html>
