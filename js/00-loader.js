@@ -1,5 +1,5 @@
-const APP_VERSION = "1.3.1";
-const APP_SCRIPTS = ["js/01-core.js", "js/02-import-01.js", "js/02-import-02.js", "js/02-import-03.js", "js/03-datatables-01.js", "js/03-datatables-02.js", "js/04-assignments-route-01.js", "js/04-assignments-route-02.js", "js/05-dashboard-integrity.js", "js/06-init.js"];
+const APP_VERSION = "1.4.0";
+const APP_SCRIPTS = ["js/01-core.js", "js/02-import-01.js", "js/02-import-02.js", "js/02-import-03.js", "js/03-datatables-01.js", "js/03-datatables-02.js", "js/04-assignments-route-01.js", "js/04-assignments-route-02.js", "js/05-dashboard-integrity.js", "js/05-mobile-order-camera.js", "js/06-init.js"];
 (async () => {
   const host = document.getElementById('viewHost');
   try {
