@@ -1,0 +1,189 @@
+<div class="view active" id="view-dashboard">
+<div class="kpi-grid">
+<div class="kpi-card"><div class="kpi-icon"><i data-lucide="map-pin"></i></div><div><div class="kpi-label">UBICACIONES</div><div class="kpi-value" id="kpiLocations">0</div><div class="kpi-note">Maestro procesado</div></div></div>
+<div class="kpi-card"><div class="kpi-icon"><i data-lucide="package-check"></i></div><div><div class="kpi-label">CON PRODUCTO</div><div class="kpi-value" id="kpiAssigned">0</div><div class="kpi-note">Puestos fijos asignados</div></div></div>
+<div class="kpi-card"><div class="kpi-icon"><i data-lucide="shield-alert"></i></div><div><div class="kpi-label">BLOQUEADAS</div><div class="kpi-value" id="kpiBlocked">0</div><div class="kpi-note">Putaway o removal block</div></div></div>
+<div class="kpi-card"><div class="kpi-icon"><i data-lucide="clipboard-check"></i></div><div><div class="kpi-label">CONTROLADAS</div><div class="kpi-value" id="kpiAudited">0</div><div class="kpi-note">Ubicaciones con resultado</div></div></div>
+<div class="kpi-card"><div class="kpi-icon"><i data-lucide="gauge"></i></div><div><div class="kpi-label">INTEGRIDAD</div><div class="kpi-value" id="kpiIntegrityDash">100%</div><div class="kpi-note">Registros OK / controlados</div></div></div>
+<div class="kpi-card"><div class="kpi-icon"><i data-lucide="triangle-alert"></i></div><div><div class="kpi-label">DISCREPANCIAS</div><div class="kpi-value" id="kpiDiscrepanciesDash">0</div><div class="kpi-note">Registros con hallazgo</div></div></div>
+</div>
+<div class="dashboard-grid">
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Disponibilidad</div><h2 class="card-title">Estado de ubicaciones</h2><p class="card-subtitle">Distribución según bloqueos SAP.</p></div></div>
+<div class="chart-box"><canvas id="statusChart"></canvas></div>
+</div>
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Ejecución</div><h2 class="card-title">Avance por pasillo</h2><p class="card-subtitle">Ubicaciones controladas por recorrido.</p></div></div>
+<div class="chart-box"><canvas id="aisleChart"></canvas></div>
+</div>
+</div>
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Inicio rápido</div><h2 class="card-title">Flujo del prototipo</h2></div></div>
+<div class="info-strip">
+<div class="info-pill"><span>PASO 1</span><strong>Importar Storage Bin</strong></div>
+<div class="info-pill"><span>PASO 2</span><strong>Importar Physical Stock</strong></div>
+<div class="info-pill"><span>PASO 3</span><strong>Importar Fixed Bin</strong></div>
+<div class="info-pill"><span>PASO 4</span><strong>Asignar pasillos</strong></div>
+<div class="info-pill"><span>PASO 5</span><strong>Ejecutar recorrida</strong></div>
+</div>
+</div>
+</div>
+
+<div class="view" id="view-import">
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Origen SAP</div><h2 class="card-title">Carga de archivos</h2><p class="card-subtitle">El sistema detecta automáticamente la hoja y la fila de títulos. No depende del nombre del archivo, de la cantidad ni del orden de las columnas; la clave obligatoria en los tres archivos es <b>Storage Bin</b>.</p></div><button class="btn-app btn-ghost-app" id="loadDemoBtn"><i data-lucide="flask-conical"></i>Cargar demo</button></div>
+<div class="upload-grid">
+<label class="drop-zone" id="storageDrop">
+<input accept=".xlsx,.xls,.xlsm,.xlsb,.csv" id="storageFile" type="file"/>
+<div><div class="upload-icon"><i data-lucide="warehouse"></i></div><h3 class="card-title">1. Storage Bin</h3><p class="card-subtitle">Columna clave: Storage Bin. Se detectan automáticamente bloqueos, grupos, pasillo, columna y nivel aunque cambien de posición.</p><div class="file-state" id="storageFileState">Seleccionar o arrastrar archivo</div></div>
+</label>
+<label class="drop-zone" id="physicalDrop">
+<input accept=".xlsx,.xls,.xlsm,.xlsb,.csv" id="physicalFile" type="file"/>
+<div><div class="upload-icon"><i data-lucide="boxes"></i></div><h3 class="card-title">2. Physical Stock</h3><p class="card-subtitle">Columna clave: Storage Bin. Se traen Product, Product Description, Handling Unit, Quantity y demás columnas reconocidas.</p><div class="file-state" id="physicalFileState">Seleccionar o arrastrar archivo</div></div>
+</label>
+<label class="drop-zone" id="fixedDrop">
+<input accept=".xlsx,.xls,.xlsm,.xlsb,.csv" id="fixedFile" type="file"/>
+<div><div class="upload-icon"><i data-lucide="package-search"></i></div><h3 class="card-title">3. Fixed Bin Assignment</h3><p class="card-subtitle">Columna clave: Storage Bin. Se traen Product, Product Description, mínimos, máximos y demás columnas reconocidas.</p><div class="file-state" id="fixedFileState">Seleccionar o arrastrar archivo</div></div>
+</label>
+</div>
+<div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mt-4">
+<div class="text-muted">Procesamiento 100% local. El nombre del archivo, la hoja y la posición de las columnas pueden variar.</div>
+<button class="btn-app btn-primary-app" id="processBtn"><i data-lucide="workflow"></i>Procesar y cruzar archivos</button>
+</div>
+</div>
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Resultado</div><h2 class="card-title">Resumen de procesamiento</h2></div></div>
+<div class="info-strip">
+<div class="info-pill"><span>STORAGE BIN</span><strong id="sumStorage">0 registros</strong></div>
+<div class="info-pill"><span>PHYSICAL STOCK</span><strong id="sumPhysical">0 registros</strong></div>
+<div class="info-pill"><span>FIXED BIN</span><strong id="sumFixed">0 registros</strong></div>
+<div class="info-pill"><span>PASILLOS</span><strong id="sumAisles">0</strong></div>
+<div class="info-pill"><span>PRODUCTOS EN STOCK</span><strong id="sumProducts">0</strong></div>
+</div>
+<div class="mt-3 text-muted" id="importValidation">Aún no se procesaron archivos.</div>
+</div>
+</div>
+
+<div class="view" id="view-master">
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Listado imprimible</div><h2 class="card-title">Maestro de ubicaciones cruzado</h2><p class="card-subtitle">Orden: Pasillo → Nivel → Columna. La multiplicidad se calcula por producto.</p></div></div>
+<div class="filters no-print">
+<div><label class="field-label">BUSCAR</label><input class="input-app" id="filterSearch" placeholder="Ubicación, producto o descripción..."/></div>
+<div><label class="field-label">PASILLO</label><select class="input-app" id="filterAisle"><option value="all">Todos</option></select></div>
+<div><label class="field-label">STORAGE GROUP</label><select class="input-app" id="filterGroup"><option value="all">Todos (incluye vacíos)</option><option value="BLKA">BLKA</option><option value="BLKB">BLKB</option><option value="BLKC">BLKC</option><option value="__EMPTY__">Vacío</option></select></div>
+<div><label class="field-label">BLOQUEO</label><select class="input-app" id="filterBlock"><option value="all">Todos</option><option value="none">Sin bloqueo</option><option value="removal">Removal</option><option value="putaway">Putaway</option><option value="both">Ambos</option></select></div>
+<div><label class="field-label">ASIGNACIÓN</label><select class="input-app" id="filterAssignment"><option value="all">Todas</option><option value="assigned">Con producto</option><option value="unassigned">Sin producto</option><option value="multiple">Múltiples</option></select></div>
+<div><label class="field-label">STOCK FÍSICO</label><select class="input-app" id="filterStock"><option value="all">Todos</option><option value="stock">Con stock</option><option value="empty">Vacías</option><option value="match">Coincide con asignación</option><option value="difference">Con diferencia</option></select></div>
+</div>
+<div class="toolbar no-print mt-3">
+<div><strong id="masterCount">0</strong> <span class="text-muted">ubicaciones visibles</span></div>
+<div class="datatable-tools">
+<label class="d-flex align-items-center gap-2"><span class="text-muted">Filas</span><select class="input-app page-size-select" id="masterPageSize"><option>10</option><option selected="">25</option><option>50</option><option>100</option></select></label>
+<div class="column-picker"><button class="btn-app btn-sm-app" id="masterColumnsBtn"><i data-lucide="columns-3"></i>Columnas</button><div class="column-menu" id="masterColumnsMenu"></div></div>
+<button class="btn-app btn-sm-app" id="exportXlsxBtn"><i data-lucide="sheet"></i>Excel</button>
+<button class="btn-app btn-sm-app" id="exportPdfBtn"><i data-lucide="file-text"></i>PDF</button>
+<button class="btn-app btn-sm-app" id="printBtn"><i data-lucide="printer"></i>Imprimir</button>
+</div>
+</div>
+<div class="table-shell">
+<table class="table-app" id="masterTable">
+<thead><tr id="masterHead"></tr></thead>
+<tbody id="masterBody"></tbody>
+</table>
+</div>
+<div class="pagination-app no-print"><span id="pageInfo">Página 1 de 1</span><div class="pager-controls"><button class="btn-app btn-sm-app" id="prevPage"><i data-lucide="chevron-left"></i></button><button class="btn-app btn-sm-app" id="nextPage"><i data-lucide="chevron-right"></i></button></div></div>
+</div>
+</div>
+
+<div class="view" id="view-assignments">
+<div class="assignment-layout">
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Equipo</div><h2 class="card-title">Usuarios de control</h2><p class="card-subtitle">Alta local para el prototipo.</p></div></div>
+<div class="d-flex gap-2 mb-3"><input class="input-app" id="newUserName" placeholder="Nombre y apellido"/><button class="btn-app btn-primary-app" id="addUserBtn"><i data-lucide="user-plus"></i></button></div>
+<div class="user-list" id="userList"></div>
+</div>
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Planificación</div><h2 class="card-title">Asignar pasillos</h2><p class="card-subtitle">Un usuario puede tener uno o más pasillos.</p></div></div>
+<div class="row g-2 mb-3">
+<div class="col-md-5"><label class="field-label">USUARIO</label><select class="input-app" id="assignmentUser"><option value="">Seleccionar</option></select></div>
+<div class="col-md-5"><label class="field-label">PASILLO</label><select class="input-app" id="assignmentAisle"><option value="">Seleccionar</option></select></div>
+<div class="col-md-2 d-flex align-items-end"><button class="btn-app btn-primary-app w-100" id="assignBtn"><i data-lucide="plus"></i>Asignar</button></div>
+</div>
+<div class="toolbar no-print">
+<div><strong id="assignmentCount">0</strong> <span class="text-muted">asignaciones</span></div>
+<div class="datatable-tools">
+<label class="d-flex align-items-center gap-2"><span class="text-muted">Filas</span><select class="input-app page-size-select" id="assignmentPageSize"><option>10</option><option selected="">25</option><option>50</option><option>100</option></select></label>
+<div class="column-picker"><button class="btn-app btn-sm-app" id="assignmentColumnsBtn"><i data-lucide="columns-3"></i>Columnas</button><div class="column-menu" id="assignmentColumnsMenu"></div></div>
+</div>
+</div>
+<div class="table-shell">
+<table class="table-app has-actions" id="assignmentTable" style="min-width:760px"><thead><tr id="assignmentHead"></tr></thead><tbody id="assignmentBody"></tbody></table>
+</div>
+<div class="pagination-app no-print"><span id="assignmentPageInfo">Página 1 de 1</span><div class="pager-controls"><button class="btn-app btn-sm-app" id="assignmentPrevPage"><i data-lucide="chevron-left"></i></button><button class="btn-app btn-sm-app" id="assignmentNextPage"><i data-lucide="chevron-right"></i></button></div></div>
+</div>
+</div>
+</div>
+
+<div class="view" id="view-route">
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Control secuencial</div><h2 class="card-title">Recorrida por depósito</h2><p class="card-subtitle">Un resultado por ubicación: OK o Discrepancia. El registro actualiza dashboard e integridad.</p></div></div>
+<div class="route-top">
+<div><label class="field-label">USUARIO</label><select class="input-app" id="routeUser"><option value="">Seleccionar</option></select></div>
+<div><label class="field-label">PASILLO ASIGNADO</label><select class="input-app" id="routeAisle"><option value="">Seleccionar usuario</option></select></div>
+<div class="d-flex align-items-end"><button class="btn-app btn-primary-app w-100" id="startRouteBtn"><i data-lucide="play"></i>Iniciar / continuar</button></div>
+</div>
+<div class="route-empty" id="routeWorkspace"><div><i data-lucide="scan-line"></i><h3 class="card-title mt-3">Seleccione un usuario y un pasillo</h3><p>La secuencia respetará el orden Pasillo → Nivel → Columna.</p></div></div>
+</div>
+</div>
+
+<div class="view" id="view-integrity">
+<div class="kpi-grid">
+<div class="kpi-card"><div class="kpi-icon"><i data-lucide="gauge"></i></div><div><div class="kpi-label">INTEGRIDAD</div><div class="kpi-value" id="integrityKpi">100%</div><div class="kpi-note">Controles conformes / controles realizados</div></div></div>
+<div class="kpi-card"><div class="kpi-icon"><i data-lucide="route"></i></div><div><div class="kpi-label">AVANCE</div><div class="kpi-value" id="completionKpi">0%</div><div class="kpi-note">Ubicaciones controladas / asignadas</div></div></div>
+<div class="kpi-card"><div class="kpi-icon"><i data-lucide="triangle-alert"></i></div><div><div class="kpi-label">DISCREPANCIAS</div><div class="kpi-value" id="discrepancyKpi">0</div><div class="kpi-note">Ubicaciones registradas con hallazgo</div></div></div>
+<div class="kpi-card"><div class="kpi-icon"><i data-lucide="clock-3"></i></div><div><div class="kpi-label">ÚLTIMO CONTROL</div><div class="kpi-value" id="lastAuditKpi" style="font-size:1rem">—</div><div class="kpi-note">Fecha y hora local</div></div></div>
+</div>
+<div class="dashboard-grid">
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Índice global</div><h2 class="card-title">Integridad de inventario</h2></div></div>
+<div class="integrity-hero">
+<div class="score-ring" id="scoreRing"><div class="score-copy"><strong id="scoreValue">100%</strong><span>Integridad</span></div></div>
+<div class="metric-bars" id="metricBars"></div>
+</div>
+</div>
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Tendencia</div><h2 class="card-title">Resultado por pasillo</h2></div></div>
+<div class="chart-box"><canvas id="integrityChart"></canvas></div>
+</div>
+</div>
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Hallazgos</div><h2 class="card-title">Registro de discrepancias</h2><p class="card-subtitle">Una fila por ubicación controlada con discrepancia.</p></div></div>
+<div class="toolbar no-print">
+<div><strong id="discrepancyCount">0</strong> <span class="text-muted">discrepancias</span></div>
+<div class="datatable-tools">
+<label class="d-flex align-items-center gap-2"><span class="text-muted">Filas</span><select class="input-app page-size-select" id="auditPageSize"><option>10</option><option selected="">25</option><option>50</option><option>100</option></select></label>
+<div class="column-picker"><button class="btn-app btn-sm-app" id="auditColumnsBtn"><i data-lucide="columns-3"></i>Columnas</button><div class="column-menu" id="auditColumnsMenu"></div></div>
+<button class="btn-app btn-sm-app" id="exportAuditBtn"><i data-lucide="download"></i>Exportar controles</button>
+</div>
+</div>
+<div class="table-shell"><table class="table-app" id="auditTable" style="min-width:1250px"><thead><tr id="auditHead"></tr></thead><tbody id="discrepancyBody"></tbody></table></div>
+<div class="pagination-app no-print"><span id="auditPageInfo">Página 1 de 1</span><div class="pager-controls"><button class="btn-app btn-sm-app" id="auditPrevPage"><i data-lucide="chevron-left"></i></button><button class="btn-app btn-sm-app" id="auditNextPage"><i data-lucide="chevron-right"></i></button></div></div>
+</div>
+</div>
+
+<div class="view" id="view-settings">
+<div class="card-app">
+<div class="card-head"><div><div class="section-kicker">Prototipo</div><h2 class="card-title">Configuración y datos locales</h2><p class="card-subtitle">Los usuarios, asignaciones y controles se guardan en este navegador.</p></div></div>
+<div class="info-strip mb-3">
+<div class="info-pill"><span>VERSIÓN</span><strong>1.3 Conteo cíclico y DataTable</strong></div>
+<div class="info-pill"><span>ORDEN</span><strong>Pasillo / Nivel / Columna</strong></div>
+<div class="info-pill"><span>CLAVE DE CRUCE</span><strong>Storage Bin</strong></div>
+<div class="info-pill"><span>PERSISTENCIA</span><strong>Local Storage</strong></div>
+</div>
+<div class="d-flex gap-2 flex-wrap">
+<button class="btn-app btn-danger-app" id="clearAuditsBtn"><i data-lucide="eraser"></i>Borrar controles</button>
+<button class="btn-app btn-danger-app" id="clearAllBtn"><i data-lucide="trash-2"></i>Restablecer datos locales</button>
+</div>
+<div class="mt-4 text-muted"><b>Fuente de inventario:</b> el producto, los números de Handling Unit y la cantidad base de cada ubicación provienen de <b>Physical Stock</b>. La cantidad es la suma de <i>Quantity</i> de todos los registros/HU encontrados para el mismo <i>Storage Bin</i>. Fixed Bin Assignment se utiliza únicamente como referencia de producto asignado, mínimos, máximos y multiplicidad.</div>
+</div>
+</div>
